@@ -1,6 +1,8 @@
 ﻿using GeoJsonConvertToSqlApp.Models;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
 
 namespace GeoJsonConvertToSqlApp.ViewModels
@@ -15,8 +17,10 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             this.Kanri1Text = "管理機関大分類コード：";
             this.Kanri2Text = "中分類コード：";
             this.Kanri3Text = "小分類コード：";
-            this.SelectCsvText = Util.GetCurrentAppDir() + @"\M_JUNKAI_COURSE.csv";
-            this.SelectFolderText = Util.GetCurrentAppDir() + @"\geojson";
+            _select_csv = exists(Util.GetCurrentAppDir() + @"\M_JUNKAI_COURSE.csv"); 
+            _select_folder = exists(Util.GetCurrentAppDir() + @"\geojson");
+            this.SelectCsvText = _select_csv;
+            this.SelectFolderText = _select_folder;
 
             // ボタンアクション
             this.OpenFile = new DelegateCommand(
@@ -27,7 +31,6 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         ofDialog.Title = "CSVファイル選択";
                         if (ofDialog.ShowDialog() == DialogResult.OK)
                         {
-                            Console.WriteLine(ofDialog.FileName);
                             this.SelectCsvText = ofDialog.FileName;
                         }
                         else
@@ -42,24 +45,49 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             this.OpenFolder = new DelegateCommand(
                 () =>
                 {
-                    System.Windows.Forms.FolderBrowserDialog fbDialog = new System.Windows.Forms.FolderBrowserDialog();
-                    fbDialog.SelectedPath = @"C:";
-                    fbDialog.Description = "GeoJSONフォルダ選択";
-                    fbDialog.ShowNewFolderButton = true;
-                    if (fbDialog.ShowDialog() == DialogResult.OK)
+                    try
                     {
-                        Console.WriteLine(fbDialog.SelectedPath);
-                        this.SelectFolderText = fbDialog.SelectedPath;
+                        FolderBrowserDialog fbDialog = new FolderBrowserDialog();
+                        fbDialog.SelectedPath = @"C:";
+                        fbDialog.Description = "GeoJSONフォルダ選択";
+                        fbDialog.ShowNewFolderButton = true;
+                        if (fbDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            this.SelectFolderText = fbDialog.SelectedPath;
+                            IEnumerable<string> files = Directory.EnumerateFiles(fbDialog.SelectedPath, "*.geojson");
+                            foreach (string str in files)
+                            {
+                                Console.WriteLine(str);
+                            }
+
+                        }
+                        else
+                        {
+                            Console.WriteLine("キャンセルされました");
+                            this.LogText = "キャンセルされました";
+                        }
+                        fbDialog.Dispose();
                     }
-                    else
+                    catch (Exception e)
                     {
-                        Console.WriteLine("キャンセルされました");
-                        this.LogText = "キャンセルされました";
+                        Console.WriteLine(e);
+                        this.LogText = e.StackTrace;
                     }
-                    fbDialog.Dispose();
                 },
                 () => true
             );
+        }
+
+        private string exists(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                string err = "選択している " + filePath + " は存在しません";
+                Console.WriteLine(err);
+                this.LogText = err;
+                return "";
+            }
+            return filePath;
         }
 
         /// <summary>
@@ -113,6 +141,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             }
         }
         private string _select_csv_text;
+        private string _select_csv;
 
         /// <summary>
         /// 選択中フォルダ名テキスト
@@ -130,6 +159,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             }
         }
         private string _select_folder_text;
+        private string _select_folder;
 
         /// <summary>
         /// Logテキスト
