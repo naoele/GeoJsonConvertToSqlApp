@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:GeoJsonConvertToSqlApp.ViewModels"
         mc:Ignorable="d"
-        Title="MainView" Height="450" Width="800">
+        Title="MainView" Height="750" Width="800">
     <Window.DataContext>
         <vm:MainViewModel/>
     </Window.DataContext>
@@ -14,35 +14,189 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="4*"/>
             <RowDefinition Height="4*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Label             
-               Margin="12,10,10,10" 
-               Content="{Binding CsvText}"
-               VerticalAlignment="Center"  HorizontalAlignment="Left"
-               Grid.Row="0" Grid.Column="0" />
+        <!-- 1行目 -->
+        <Label
+            Margin="12,10,10,10" 
+            Content="{Binding CsvText}"
+            VerticalAlignment="Center"  
+            HorizontalAlignment="Left"
+            Grid.Row="0" 
+            Grid.Column="0" />
 
-        <Label             
-               Margin="12,10,10,10" 
-               Content="{Binding GeojsonText}"
-               VerticalAlignment="Center"  HorizontalAlignment="Left"
-               Grid.Row="1" Grid.Column="0" />
+        <StackPanel 
+            Margin="8" 
+            Orientation="Vertical" 
+            Grid.Row="0" 
+            Grid.Column="1" >
+
+            <TextBlock 
+                TextWrapping="Wrap" 
+                Text="{Binding SelectCsvText}" 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Top" />
+
+        </StackPanel>
+
+        <Button
+            Height ="28" 
+            Width ="120" 
+            Margin="12,0,12,0" 
+            Content="巡回コースCSV取得" 
+            Command="{Binding OpenFile}"
+            VerticalAlignment="Center"  
+            HorizontalAlignment="center"
+            Grid.Row="0" 
+            Grid.Column="2" />
+
+        <!-- 2行目 -->
+        <Label
+            Margin="12,10,10,10" 
+            Content="{Binding GeojsonText}"
+            VerticalAlignment="Center"  
+            HorizontalAlignment="Left"
+            Grid.Row="1" 
+            Grid.Column="0" />
+
+        <StackPanel 
+            Margin="8" 
+            Orientation="Vertical" 
+            Grid.Row="1" 
+            Grid.Column="1" >
+
+            <TextBlock 
+                TextWrapping="Wrap" 
+                Text="{Binding SelectFolderText}" 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Top" />
+
+        </StackPanel>
 
         <Button 
-               Height ="28"             Margin="12,0,12,0" 
-               Content="巡回コースCSV取得" Width ="120" Command="{Binding OpenFile}"
-               VerticalAlignment="Center"  HorizontalAlignment="center"
-               Grid.Row="0" Grid.Column="1" />
+            Height ="28"             
+            Width ="120" 
+            Content="GeoJSON取得" 
+            Command="{Binding OpenFolder}"
+            Margin="12,0,12,0" 
+            VerticalAlignment="Center" 
+            HorizontalAlignment="center"
+            Grid.Row="1" 
+            Grid.Column="2" />
 
-        <Button Height ="28"             Margin="12,0,12,0" 
-               Content="GeoJSON取得" Width ="120" Command="{Binding OpenFolder}"
-               VerticalAlignment="Center"  HorizontalAlignment="center"
-               Grid.Row="1" Grid.Column="1" />
+        <!-- 3行目 -->
+        <StackPanel 
+            Margin="8" 
+            Orientation="Horizontal" 
+            Grid.Row="2" 
+            Grid.Column="0"
+            Grid.ColumnSpan="3">
+
+            <Label
+                Margin="8" 
+                Content="{Binding Kanri1Text}"
+                VerticalAlignment="Center"  
+                HorizontalAlignment="Right" />
+
+            <TextBox 
+                Height ="28"             
+                Width ="60" 
+                Margin="8"
+                TextWrapping="NoWrap" 
+                VerticalAlignment="Center"  
+                HorizontalAlignment="Left" />
+
+            <Label
+                Margin="8" 
+                Content="{Binding Kanri2Text}"
+                VerticalAlignment="Center"  
+                HorizontalAlignment="Right" />
+
+            <TextBox 
+                Height ="28"             
+                Width ="60" 
+                Margin="8"
+                TextWrapping="NoWrap" 
+                VerticalAlignment="Center"  
+                HorizontalAlignment="Left" />
+
+            <Label
+                Margin="8" 
+                Content="{Binding Kanri3Text}"
+                VerticalAlignment="Center"  
+                HorizontalAlignment="Right" />
+
+            <TextBox 
+                Height ="28"             
+                Width ="60" 
+                Margin="8"
+                TextWrapping="NoWrap" 
+                VerticalAlignment="Center"  
+                HorizontalAlignment="Left" />
+
+        </StackPanel>
+
+        <Button 
+            Height ="28"             
+            Width ="120" 
+            Content="コースSQL作成" 
+            Command="{Binding OpenFolder}"
+            Margin="12,0,12,0" 
+            VerticalAlignment="Center" 
+            HorizontalAlignment="center"
+            Grid.Row="2" 
+            Grid.Column="2" />
+
+        <!-- 4行目 -->
+        <ScrollViewer 
+            Margin="8"
+            VerticalScrollBarVisibility="Auto" 
+            Grid.Row="3"
+            Grid.Column="0" 
+            Grid.ColumnSpan="3" >
+
+            <TextBlock 
+                    HorizontalAlignment="Left" 
+                    TextWrapping="Wrap" 
+                    Text="{Binding LogText}" 
+                    Foreground="Red"
+                    VerticalAlignment="Top" />
+
+        </ScrollViewer>
+
+
+        <!-- 5行目 -->
+        <Border
+            Margin="0,8,0,0"
+            BorderThickness="1"
+            CornerRadius="4"
+            BorderBrush="Gray"
+            Grid.Row="4"
+            Grid.Column="0" 
+            Grid.ColumnSpan="3" >
+
+            <ScrollViewer 
+                Margin="8"
+                VerticalScrollBarVisibility="Auto" >
+
+                <TextBlock 
+                    HorizontalAlignment="Left" 
+                    TextWrapping="Wrap" 
+                    Text="{Binding LogText}" 
+                    Foreground="Red"
+                    VerticalAlignment="Top" />
+
+            </ScrollViewer>
+
+        </Border>
 
     </Grid>
 
