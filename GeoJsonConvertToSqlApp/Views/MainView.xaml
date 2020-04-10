@@ -166,8 +166,7 @@
             <TextBlock 
                     HorizontalAlignment="Left" 
                     TextWrapping="Wrap" 
-                    Text="{Binding LogText}" 
-                    Foreground="Red"
+                    Text="{Binding CourseText}" 
                     VerticalAlignment="Top" />
 
         </ScrollViewer>

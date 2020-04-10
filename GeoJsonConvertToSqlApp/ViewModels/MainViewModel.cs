@@ -32,6 +32,12 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         if (ofDialog.ShowDialog() == DialogResult.OK)
                         {
                             this.SelectCsvText = ofDialog.FileName;
+                            List<CourseCsv> list = Util.ReadCsv(ofDialog.FileName);
+                            foreach (CourseCsv model in list)
+                            {
+                                string txt = "" + model.id + "   " + model.junkai_course_name;
+                                this.CourseText = txt;
+                            }
                         }
                         else
                         {
@@ -160,6 +166,23 @@ namespace GeoJsonConvertToSqlApp.ViewModels
         }
         private string _select_folder_text;
         private string _select_folder;
+
+        /// <summary>
+        /// Logテキスト
+        /// </summary>
+        public string CourseText
+        {
+            get { return _course_text; }
+            private set
+            {
+                if (value != null && value != _course_text)
+                {
+                    _course_text += value + "\n";
+                    this.OnPropertyChanged("CourseText");
+                }
+            }
+        }
+        private string _course_text;
 
         /// <summary>
         /// Logテキスト
