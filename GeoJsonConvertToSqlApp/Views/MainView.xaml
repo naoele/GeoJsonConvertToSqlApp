@@ -3,10 +3,33 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:GeoJsonConvertToSqlApp.Views"
+        xmlns:vm="clr-namespace:GeoJsonConvertToSqlApp.ViewModels"
         mc:Ignorable="d"
         Title="MainView" Height="450" Width="800">
-    <Grid>
-        
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="4*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label             Margin="12,10,10,10" 
+               Content="{Binding Text}"
+               VerticalAlignment="Center"  HorizontalAlignment="Left"
+               Grid.Row="0" Grid.Column="0" />
+
+        <Button Height ="28"             Margin="12,0,12,0" 
+               Content="開く" Width ="100" Command="{Binding OpenFolder}"
+               VerticalAlignment="Center"  HorizontalAlignment="center"
+               Grid.Row="0" Grid.Column="1" />
+
     </Grid>
+
 </Window>
