@@ -13,22 +13,36 @@
     <Grid Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="4*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="4*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Label             Margin="12,10,10,10" 
-               Content="{Binding Text}"
+        <Label             
+               Margin="12,10,10,10" 
+               Content="{Binding CsvText}"
                VerticalAlignment="Center"  HorizontalAlignment="Left"
                Grid.Row="0" Grid.Column="0" />
 
-        <Button Height ="28"             Margin="12,0,12,0" 
-               Content="開く" Width ="100" Command="{Binding OpenFolder}"
+        <Label             
+               Margin="12,10,10,10" 
+               Content="{Binding GeojsonText}"
+               VerticalAlignment="Center"  HorizontalAlignment="Left"
+               Grid.Row="1" Grid.Column="0" />
+
+        <Button 
+               Height ="28"             Margin="12,0,12,0" 
+               Content="巡回コースCSV取得" Width ="120" Command="{Binding OpenFile}"
                VerticalAlignment="Center"  HorizontalAlignment="center"
                Grid.Row="0" Grid.Column="1" />
+
+        <Button Height ="28"             Margin="12,0,12,0" 
+               Content="GeoJSON取得" Width ="120" Command="{Binding OpenFolder}"
+               VerticalAlignment="Center"  HorizontalAlignment="center"
+               Grid.Row="1" Grid.Column="1" />
 
     </Grid>
 

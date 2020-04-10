@@ -13,35 +13,59 @@ namespace GeoJsonConvertToSqlApp.ViewModels
         /// <summary>
         /// フォルダを開く
         /// </summary>
+        public DelegateCommand OpenFile { get; private set; }
         public DelegateCommand OpenFolder { get; private set; }
         private int cnt = 1;
 
         public MainViewModel()
         {
-            this.Text = "GoeJSONファイルをSQLファイルに変換します。\n「開く」ボタンから変換するGeoJSONファイルのあるフォルダを選択してください。";
+            this.CsvText = "巡回コースマスタCSVファイルを選択してください。";
+            this.GeojsonText = "GoeJSONファイルをSQLファイルに変換します。\n「開く」ボタンから変換するGeoJSONファイルのあるフォルダを選択してください。";
+            this.OpenFile = new DelegateCommand(
+                () =>
+                {
+                    this.CsvText = "" + cnt;
+                    cnt++;
+                },
+                () => true
+                );
             this.OpenFolder = new DelegateCommand(
                 () =>
                 {
-                    this.Text = "" + cnt;
+                    this.GeojsonText = "" + cnt;
                     cnt++;
                 },
                 () => true
                 );
         }
 
-        public string Text
+        public string CsvText
         {
-            get { return _text; }
+            get { return _csv_text; }
             private set
             {
-                if (value != null && value != _text)
+                if (value != null && value != _csv_text)
                 {
-                    _text = value;
-                    this.OnPropertyChanged("Text");
+                    _csv_text = value;
+                    this.OnPropertyChanged("CsvText");
                 }
             }
         }
-        private string _text;
+        private string _csv_text;
+
+        public string GeojsonText
+        {
+            get { return _geojson_text; }
+            private set
+            {
+                if (value != null && value != _geojson_text)
+                {
+                    _geojson_text = value;
+                    this.OnPropertyChanged("GeojsonText");
+                }
+            }
+        }
+        private string _geojson_text;
 
     }
 
