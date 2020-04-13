@@ -110,6 +110,7 @@
                 Height ="28"             
                 Width ="60" 
                 Margin="8"
+                Text = "{Binding Path=DaiBunruiCodeTextbox, Mode=TwoWay}"
                 TextWrapping="NoWrap" 
                 VerticalAlignment="Center"  
                 HorizontalAlignment="Left" />
@@ -124,6 +125,7 @@
                 Height ="28"             
                 Width ="60" 
                 Margin="8"
+                Text = "{Binding Path=DaiBunruiCodeTextbox, Mode=TwoWay}"
                 TextWrapping="NoWrap" 
                 VerticalAlignment="Center"  
                 HorizontalAlignment="Left" />
@@ -138,6 +140,7 @@
                 Height ="28"             
                 Width ="60" 
                 Margin="8"
+                Text = "{Binding Path=DaiBunruiCodeTextbox, Mode=TwoWay}"
                 TextWrapping="NoWrap" 
                 VerticalAlignment="Center"  
                 HorizontalAlignment="Left" />

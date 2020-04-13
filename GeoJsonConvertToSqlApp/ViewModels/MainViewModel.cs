@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace GeoJsonConvertToSqlApp.ViewModels
 {
-    class MainViewModel : NotifyChangedBase
+    public class MainViewModel : NotifyChangedBase
     {
         public MainViewModel()
         {
@@ -20,6 +20,8 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             _select_folder = exists(Util.GetCurrentAppDir() + @"\geojson");
             this.SelectCsvText = _select_csv;
             this.SelectFolderText = _select_folder;
+
+            // テキストボックス双方向データバインディング
 
             // ボタンアクション
             this.OpenFile = new DelegateCommand(
@@ -180,6 +182,23 @@ namespace GeoJsonConvertToSqlApp.ViewModels
         }
         private string _select_folder_text;
         private string _select_folder;
+
+        /// <summary>
+        /// 管理機関大分類コードテキストボックス
+        /// </summary>
+        public string DaiBunruiCodeTextbox
+        {
+            get { return _dai_bunrui_textbox; }
+            set
+            {
+                if (value != null && value != _dai_bunrui_textbox)
+                {
+                    _dai_bunrui_textbox = value;
+                    this.OnPropertyChanged("DaiBunruiCodeTextbox");
+                }
+            }
+        }
+        private string _dai_bunrui_textbox;
 
         /// <summary>
         /// Logテキスト

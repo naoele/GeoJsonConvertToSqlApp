@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GeoJsonConvertToSqlApp.Models
 {
-    abstract class NotifyChangedBase : INotifyPropertyChanged
+    public abstract class NotifyChangedBase : INotifyPropertyChanged
     {
         /// <summary>
         /// プロパティが変更された際に発火するイベントハンドラ.
