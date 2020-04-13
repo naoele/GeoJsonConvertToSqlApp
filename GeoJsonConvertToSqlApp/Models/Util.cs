@@ -40,19 +40,19 @@ namespace GeoJsonConvertToSqlApp.Models
             return list;
         }
 
-        public static Geometry ReadJson(string fileName)
+        public static CoursePoint ReadJson(string fileName)
         {
             if (!File.Exists(fileName)) return null;
 
             string jsonstring = File.ReadAllText(fileName, Encoding.GetEncoding("UTF-8"));
             CourseJson json = Deserialize<CourseJson>(jsonstring);
-            if (json.features.Count != 1) throw new ArgumentOutOfRangeException("" + fileName + " は無効です。");
+            if (json.features.Count != 1) throw new ArgumentOutOfRangeException("" + fileName + " は複数の線で構成されているので無効です。");
             Geometry geometry = null;
             foreach (Features feature in json.features)
             {
                 geometry = feature.geometry;
             }
-            return geometry;
+            return new CoursePoint(fileName, geometry);
         }
 
         /// <summary>
@@ -69,5 +69,42 @@ namespace GeoJsonConvertToSqlApp.Models
                 return (T)serializer.ReadObject(stream);
             }
         }
+
+        /// <summary>
+        /// 同じ分類コードで同じ名前のコースがあった場合にメッセージを表示する
+        /// </summary>
+        /// <param name="list"></param>
+        public static string CheckDuplication(List<CourseCsv> list)
+        {
+            string errMsg = "";
+            var indexList = new List<int>();
+            var hashset = new HashSet<string>();
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (hashset.Add(list[i].junkai_course_name) ==  false)
+                {
+                    indexList.Add(i);
+                }
+            }
+            foreach (int index in indexList)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (index == i) continue;
+
+                    CourseCsv value = list[i];
+                    CourseCsv duplication = list[index];
+                    if (value.junkai_course_name == duplication.junkai_course_name)
+                    {
+                        if (value.cd_kikan1 == duplication.cd_kikan1 && value.cd_kikan2 == duplication.cd_kikan2 && value.cd_kikan3 == duplication.cd_kikan3)
+                        {
+                            errMsg += duplication.junkai_course_name + " は重複しています。\n";
+                        }
+                    }
+                }
+            }
+            return errMsg;
+        }
+
     }
 }

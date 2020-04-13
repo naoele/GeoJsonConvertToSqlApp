@@ -32,9 +32,17 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         {
                             this.SelectCsvText = ofDialog.FileName;
                             _csv_list = Util.ReadCsv(ofDialog.FileName);
+
+                            string errMsg = Util.CheckDuplication(_csv_list);
+                            if (errMsg != "")
+                            {
+                                Console.WriteLine(errMsg);
+                                this.LogText = errMsg;
+                            }
+
                             foreach (CourseCsv model in _csv_list)
                             {
-                                string txt = "" + model.id + "   " + model.junkai_course_name;
+                                string txt = "" + model.id + ", " + model.cd_kikan1+ ", " + model.cd_kikan2+ ", " + model.cd_kikan3+ ", " + model.junkai_course_name;
                                 this.CourseText = txt;
                             }
                         }
@@ -58,14 +66,14 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         fbDialog.ShowNewFolderButton = true;
                         if (fbDialog.ShowDialog() == DialogResult.OK)
                         {
-                            List<CourseJson> list = new List<CourseJson>();
+                            List<CoursePoint> list = new List<CoursePoint>();
                             this.SelectFolderText = fbDialog.SelectedPath;
                             IEnumerable<string> files = Directory.EnumerateFiles(fbDialog.SelectedPath, "*.geojson");
                             foreach (string str in files)
                             {
                                 Console.WriteLine(str);
-                                Geometry model = Util.ReadJson(str);
-                                //list.Add(model);
+                                CoursePoint model = Util.ReadJson(str);
+                                list.Add(model);
                             }
 
                         }

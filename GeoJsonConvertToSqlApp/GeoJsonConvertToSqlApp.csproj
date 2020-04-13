@@ -63,6 +63,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\CoursePoint.cs" />
     <Compile Include="Models\Features.cs" />
     <Compile Include="Models\Geometry.cs" />
     <Compile Include="Models\CourseJson.cs" />
