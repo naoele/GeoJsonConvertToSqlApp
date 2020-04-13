@@ -1,5 +1,4 @@
 ﻿using GeoJsonConvertToSqlApp.Models;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +16,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             this.Kanri1Text = "管理機関大分類コード：";
             this.Kanri2Text = "中分類コード：";
             this.Kanri3Text = "小分類コード：";
-            _select_csv = exists(Util.GetCurrentAppDir() + @"\M_JUNKAI_COURSE.csv"); 
+            _select_csv = exists(Util.GetCurrentAppDir() + @"\M_JUNKAI_COURSE.csv");
             _select_folder = exists(Util.GetCurrentAppDir() + @"\geojson");
             this.SelectCsvText = _select_csv;
             this.SelectFolderText = _select_folder;
@@ -32,8 +31,8 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         if (ofDialog.ShowDialog() == DialogResult.OK)
                         {
                             this.SelectCsvText = ofDialog.FileName;
-                            List<CourseCsv> list = Util.ReadCsv(ofDialog.FileName);
-                            foreach (CourseCsv model in list)
+                            _csv_list = Util.ReadCsv(ofDialog.FileName);
+                            foreach (CourseCsv model in _csv_list)
                             {
                                 string txt = "" + model.id + "   " + model.junkai_course_name;
                                 this.CourseText = txt;
@@ -59,11 +58,14 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         fbDialog.ShowNewFolderButton = true;
                         if (fbDialog.ShowDialog() == DialogResult.OK)
                         {
+                            List<CourseJson> list = new List<CourseJson>();
                             this.SelectFolderText = fbDialog.SelectedPath;
                             IEnumerable<string> files = Directory.EnumerateFiles(fbDialog.SelectedPath, "*.geojson");
                             foreach (string str in files)
                             {
                                 Console.WriteLine(str);
+                                Geometry model = Util.ReadJson(str);
+                                //list.Add(model);
                             }
 
                         }
@@ -95,6 +97,10 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             }
             return filePath;
         }
+
+
+
+        private List<CourseCsv> _csv_list;
 
         /// <summary>
         /// コースCSVファイルを開く

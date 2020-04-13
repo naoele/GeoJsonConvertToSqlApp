@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace GeoJsonConvertToSqlApp.Models
 {
@@ -39,6 +38,36 @@ namespace GeoJsonConvertToSqlApp.Models
                 list.Add(model);
             }
             return list;
+        }
+
+        public static Geometry ReadJson(string fileName)
+        {
+            if (!File.Exists(fileName)) return null;
+
+            string jsonstring = File.ReadAllText(fileName, Encoding.GetEncoding("UTF-8"));
+            CourseJson json = Deserialize<CourseJson>(jsonstring);
+            if (json.features.Count != 1) throw new ArgumentOutOfRangeException("" + fileName + " は無効です。");
+            Geometry geometry = null;
+            foreach (Features feature in json.features)
+            {
+                geometry = feature.geometry;
+            }
+            return geometry;
+        }
+
+        /// <summary>
+        /// JSONをオブジェクトへデシリアライズする
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static T Deserialize<T>(string message)
+        {
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(message)))
+            {
+                var serializer = new DataContractJsonSerializer(typeof(T));
+                return (T)serializer.ReadObject(stream);
+            }
         }
     }
 }
