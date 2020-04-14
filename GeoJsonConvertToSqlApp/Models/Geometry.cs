@@ -12,7 +12,7 @@ namespace GeoJsonConvertToSqlApp.Models
     {
 
         [DataMember(Name = "type")]
-        public string type { get; set; }
+        public string Type { get; set; }
 
         // リスト型
         [DataMember(Name = "coordinates")]

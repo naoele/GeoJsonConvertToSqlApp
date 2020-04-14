@@ -16,7 +16,7 @@ namespace GeoJsonConvertToSqlApp.Models
 
         // ハッシュマップ型
         [DataMember(Name = "features")]
-        public List<Features> features { get; private set; } = new List<Features>();
+        public List<Features> Features { get; private set; } = new List<Features>();
 
     }
 }

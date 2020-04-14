@@ -6,7 +6,7 @@ using System.Text;
 
 namespace GeoJsonConvertToSqlApp.Models
 {
-    class Util
+    public class Util
     {
         /// <summary>
         /// exe実行パス取得
@@ -46,11 +46,11 @@ namespace GeoJsonConvertToSqlApp.Models
 
             string jsonstring = File.ReadAllText(fileName, Encoding.GetEncoding("UTF-8"));
             CourseJson json = Deserialize<CourseJson>(jsonstring);
-            if (json.features.Count != 1) throw new ArgumentOutOfRangeException("" + fileName + " は複数の線で構成されているので無効です。");
+            if (json.Features.Count != 1) throw new ArgumentOutOfRangeException("" + fileName + " は複数の線で構成されているので無効です。");
             Geometry geometry = null;
-            foreach (Features feature in json.features)
+            foreach (Features feature in json.Features)
             {
-                geometry = feature.geometry;
+                geometry = feature.Geometry;
             }
             return new CoursePoint(fileName, geometry);
         }
@@ -81,7 +81,7 @@ namespace GeoJsonConvertToSqlApp.Models
             var hashset = new HashSet<string>();
             for (int i = 0; i < list.Count; i++)
             {
-                if (hashset.Add(list[i].junkai_course_name) ==  false)
+                if (hashset.Add(list[i].Junkai_course_name) == false)
                 {
                     indexList.Add(i);
                 }
@@ -94,11 +94,11 @@ namespace GeoJsonConvertToSqlApp.Models
 
                     CourseCsv value = list[i];
                     CourseCsv duplication = list[index];
-                    if (value.junkai_course_name == duplication.junkai_course_name)
+                    if (value.Junkai_course_name == duplication.Junkai_course_name)
                     {
-                        if (value.cd_kikan1 == duplication.cd_kikan1 && value.cd_kikan2 == duplication.cd_kikan2 && value.cd_kikan3 == duplication.cd_kikan3)
+                        if (value.Cd_kikan1 == duplication.Cd_kikan1 && value.Cd_kikan2 == duplication.Cd_kikan2 && value.Cd_kikan3 == duplication.Cd_kikan3)
                         {
-                            errMsg += duplication.junkai_course_name + " は重複しています。\n";
+                            errMsg += duplication.Junkai_course_name + " は重複しています。\n";
                         }
                     }
                 }

@@ -12,13 +12,10 @@ namespace GeoJsonConvertToSqlApp.Models
     {
 
         [DataMember(Name = "type")]
-        public string type { get; set; }
-
-        //[DataMember(Name = "properties")]
-        //public Properties properties { get; set; }
+        public string Type { get; set; }
 
         [DataMember(Name = "geometry")]
-        public Geometry geometry { get; set; }
+        public Geometry Geometry { get; set; }
 
     }
 }

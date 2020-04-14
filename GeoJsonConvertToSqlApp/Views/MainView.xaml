@@ -125,7 +125,7 @@
                 Height ="28"             
                 Width ="60" 
                 Margin="8"
-                Text = "{Binding Path=DaiBunruiCodeTextbox, Mode=TwoWay}"
+                Text = "{Binding Path=ChuBunruiCodeTextbox, Mode=TwoWay}"
                 TextWrapping="NoWrap" 
                 VerticalAlignment="Center"  
                 HorizontalAlignment="Left" />
@@ -140,7 +140,7 @@
                 Height ="28"             
                 Width ="60" 
                 Margin="8"
-                Text = "{Binding Path=DaiBunruiCodeTextbox, Mode=TwoWay}"
+                Text = "{Binding Path=ShoBunruiCodeTextbox, Mode=TwoWay}"
                 TextWrapping="NoWrap" 
                 VerticalAlignment="Center"  
                 HorizontalAlignment="Left" />
@@ -166,11 +166,9 @@
             Grid.Column="0" 
             Grid.ColumnSpan="3" >
 
-            <TextBlock 
-                    HorizontalAlignment="Left" 
-                    TextWrapping="Wrap" 
-                    Text="{Binding CourseText}" 
-                    VerticalAlignment="Top" />
+            <DataGrid 
+                ItemsSource="{Binding Path=CourseText, Mode=OneWay}"   
+                IsReadOnly="True" />
 
         </ScrollViewer>
 
