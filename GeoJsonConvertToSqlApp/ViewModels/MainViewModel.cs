@@ -135,13 +135,14 @@ namespace GeoJsonConvertToSqlApp.ViewModels
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        private List<CourseCsv> DuplicationCheck(List<CourseCsv> list)
+        private List<CourseCsv> DuplicationCheck(List<CourseCsv> courselist)
         {
-            if (list == null) return null;
+            if (courselist == null) return null;
 
             var courseCsvList = new List<CourseCsv>();
             try
             {
+                List<CourseCsv> list = ExtractOnlyCdKikan(courselist);
                 string errMsg = "";
                 var indexList = new List<int>();
                 var hashset = new HashSet<string>();
@@ -216,16 +217,16 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                     isMatch = true;
                     list.Add(new Course(csv));
                 }
-                if (!isMatch) this.LogText = "CSVとgeojsonでマッチするコースがありませんでした。";
+                if (!isMatch) this.LogText = "CSVにコースがありませんでした。";
             }
-            else if (course_point_list == null)
+            else if (course_csv_list == null)
             {
                 foreach (CoursePoint point in course_point_list)
                 {
                     isMatch = true;
                     list.Add(new Course(point));
                 }
-                if (!isMatch) this.LogText = "CSVとgeojsonでマッチするコースがありませんでした。";
+                if (!isMatch) this.LogText = "geojsonにコースがありませんでした。";
             }
             else
             {
@@ -303,49 +304,65 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             return dirPath;
         }
 
-        public void ExtractOnlyCdKikan1(int number)
+        public List<CourseCsv> ExtractOnlyCdKikan(List<CourseCsv> courseList)
         {
-            if (_course_csv_list == null) return;
-            List<CourseCsv> list = new List<CourseCsv>();
-            foreach (CourseCsv model in _course_csv_list)
-            {
-                if (model.Cd_kikan1 == number)
-                {
-                    list.Add(model);
-                }
-            }
-            _course_list = MergeCourse(DuplicationCheck(list), _course_point_list);
-            this.CourseText = _course_list;
-        }
+            if (courseList == null && _dai_bunrui_number == null && _chu_bunrui_number == null && _sho_bunrui_number == null) return null;
+            else if (_dai_bunrui_number == null && _chu_bunrui_number == null && _sho_bunrui_number == null) return courseList;
 
-        public void ExtractOnlyCdKikan2(int number)
-        {
-            if (_course_csv_list == null) return;
             List<CourseCsv> list = new List<CourseCsv>();
             foreach (CourseCsv model in _course_csv_list)
             {
-                if (model.Cd_kikan2 == number)
+                if (_dai_bunrui_number != null && _chu_bunrui_number != null && _sho_bunrui_number != null)
                 {
-                    list.Add(model);
+                    if (model.Cd_kikan1 == _dai_bunrui_number && model.Cd_kikan2 == _chu_bunrui_number && model.Cd_kikan3 == _sho_bunrui_number)
+                    {
+                        list.Add(model);
+                    }
+                }
+                else if (_dai_bunrui_number != null && _chu_bunrui_number != null && _sho_bunrui_number == null)
+                {
+                    if (model.Cd_kikan1 == _dai_bunrui_number && model.Cd_kikan2 == _chu_bunrui_number)
+                    {
+                        list.Add(model);
+                    }
+                }
+                else if (_dai_bunrui_number != null && _chu_bunrui_number == null && _sho_bunrui_number != null)
+                {
+                    if (model.Cd_kikan1 == _dai_bunrui_number && model.Cd_kikan3 == _sho_bunrui_number)
+                    {
+                        list.Add(model);
+                    }
+                }
+                else if (_dai_bunrui_number == null && _chu_bunrui_number != null && _sho_bunrui_number != null)
+                {
+                    if (model.Cd_kikan2 == _chu_bunrui_number && model.Cd_kikan3 == _sho_bunrui_number)
+                    {
+                        list.Add(model);
+                    }
+                }
+                else if (_dai_bunrui_number != null && _chu_bunrui_number == null && _sho_bunrui_number == null)
+                {
+                    if (model.Cd_kikan1 == _dai_bunrui_number)
+                    {
+                        list.Add(model);
+                    }
+                }
+                else if (_dai_bunrui_number == null && _chu_bunrui_number != null && _sho_bunrui_number == null)
+                {
+                    if (model.Cd_kikan2 == _chu_bunrui_number)
+                    {
+                        list.Add(model);
+                    }
+                }
+                else if (_dai_bunrui_number == null && _chu_bunrui_number == null && _sho_bunrui_number != null)
+                {
+                    if (model.Cd_kikan3 == _sho_bunrui_number)
+                    {
+                        list.Add(model);
+                    }
                 }
             }
-            _course_list = MergeCourse(DuplicationCheck(list), _course_point_list);
-            this.CourseText = _course_list;
-        }
-
-        public void ExtractOnlyCdKikan3(int number)
-        {
-            if (_course_csv_list == null) return;
-            List<CourseCsv> list = new List<CourseCsv>();
-            foreach (CourseCsv model in _course_csv_list)
-            {
-                if (model.Cd_kikan3 == number)
-                {
-                    list.Add(model);
-                }
-            }
-            _course_list = MergeCourse(DuplicationCheck(list), _course_point_list);
-            this.CourseText = _course_list;
+            return list;
         }
 
         /// <summary>
@@ -447,12 +464,14 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             get { return _dai_bunrui_textbox; }
             set
             {
+                _dai_bunrui_number = null;
                 if (value != null && value == "")
                 {
                     _dai_bunrui_textbox = value;
                     this.OnPropertyChanged("DaiBunruiCodeTextbox");
 
-                    this.CourseText = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
+                    _course_list = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
+                    this.CourseText = _course_list;
                 }
                 else if (value != null && value != _dai_bunrui_textbox)
                 {
@@ -462,12 +481,15 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         _dai_bunrui_textbox = value;
                         this.OnPropertyChanged("DaiBunruiCodeTextbox");
 
-                        ExtractOnlyCdKikan1(number);
+                        _dai_bunrui_number = number;
+                        _course_list = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
+                        this.CourseText = _course_list;
                     }
                 }
             }
         }
         private string _dai_bunrui_textbox;
+        private int? _dai_bunrui_number;
 
         /// <summary>
         /// 管理機関中分類コードテキストボックス
@@ -477,12 +499,14 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             get { return _chu_bunrui_textbox; }
             set
             {
+                _chu_bunrui_number = null;
                 if (value != null && value == "")
                 {
                     _chu_bunrui_textbox = value;
                     this.OnPropertyChanged("ChuBunruiCodeTextbox");
 
-                    this.CourseText = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
+                    _course_list = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
+                    this.CourseText = _course_list;
                 }
                 else if (value != null && value != _chu_bunrui_textbox)
                 {
@@ -492,12 +516,15 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         _chu_bunrui_textbox = value;
                         this.OnPropertyChanged("ChuBunruiCodeTextbox");
 
-                        ExtractOnlyCdKikan2(number);
+                        _chu_bunrui_number = number;
+                        _course_list = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
+                        this.CourseText = _course_list;
                     }
                 }
             }
         }
         private string _chu_bunrui_textbox;
+        private int? _chu_bunrui_number;
 
         /// <summary>
         /// 管理機関小分類コードテキストボックス
@@ -507,12 +534,14 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             get { return _sho_bunrui_textbox; }
             set
             {
+                _sho_bunrui_number = null;
                 if (value != null && value == "")
                 {
                     _sho_bunrui_textbox = value;
                     this.OnPropertyChanged("ShoBunruiCodeTextbox");
 
-                    DuplicationCheck(_course_csv_list);
+                    _course_list = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
+                    this.CourseText = _course_list;
                 }
                 else if (value != null && value != _sho_bunrui_textbox)
                 {
@@ -522,12 +551,15 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         _sho_bunrui_textbox = value;
                         this.OnPropertyChanged("ShoBunruiCodeTextbox");
 
-                        ExtractOnlyCdKikan3(number);
+                        _sho_bunrui_number = number;
+                        _course_list = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
+                        this.CourseText = _course_list;
                     }
                 }
             }
         }
         private string _sho_bunrui_textbox;
+        private int? _sho_bunrui_number;
 
         /// <summary>
         /// コースバインディング
