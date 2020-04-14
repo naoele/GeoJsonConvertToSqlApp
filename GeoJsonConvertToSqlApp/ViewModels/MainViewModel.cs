@@ -1,7 +1,9 @@
 ﻿using GeoJsonConvertToSqlApp.Models;
 using System;
 using System.Collections.Generic;
+using System.Device.Location;
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Forms;
 
@@ -26,6 +28,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             this.OpenFile = new DelegateCommand(
                 () =>
                     {
+                        // CSVを読み込み
                         OpenFileDialog ofDialog = new OpenFileDialog();
                         ofDialog.InitialDirectory = @"C:";
                         ofDialog.Title = "CSVファイル選択";
@@ -48,6 +51,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                 {
                     try
                     {
+                        // geojsonを読み込み
                         FolderBrowserDialog fbDialog = new FolderBrowserDialog();
                         fbDialog.SelectedPath = @"C:";
                         fbDialog.Description = "GeoJSONフォルダ選択";
@@ -72,6 +76,45 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                 },
                 () => true
             );
+            this.CreateSql = new DelegateCommand(
+                () =>
+                {
+                    try
+                    {
+                        // SQLを作成
+                        var sql = new StringBuilder();
+                        sql.AppendLine("INSERT INTO m_course_line_point(cd_junkai_course, disp_order, latitude, longitude) ");
+                        sql.AppendLine("VALUES ");
+                        foreach (Course c in _course_list)
+                        {
+                            int cnt = 1;
+                            foreach (GeoCoordinate Coordinate in c.Coordinates)
+                            {
+                                sql.Append(" (");
+                                sql.Append($" {c.Id},");
+                                sql.Append($" {cnt},");
+                                sql.Append($" {Coordinate.Latitude},");
+                                sql.Append($" {Coordinate.Longitude}");
+                                sql.AppendLine(" ),");
+                                cnt++;
+                            }
+                        }
+                        sql.Length -= 3;
+                        sql.AppendLine(";");
+
+                        string path = Util.GetCurrentAppDir() + "m_course_line_point.sql";
+                        File.WriteAllText(path, sql.ToString(), Encoding.GetEncoding("UTF-8"));
+                        this.LogText = path + "にSQLを作成しました。";
+
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        this.LogText = e.StackTrace;
+                    }
+                },
+                () => _course_list != null && _course_list.Count > 0 && _course_list[0].Coordinates != null
+            );
         }
 
         private string Exists(string filePath)
@@ -80,6 +123,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             {
                 string err = "選択している " + filePath + " は存在しません";
                 Console.WriteLine(err);
+                this.LogText = err;
                 return "";
             }
             return filePath;
@@ -94,6 +138,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
         private List<CourseCsv> DuplicationCheck(List<CourseCsv> list)
         {
             if (list == null) return null;
+
             var courseCsvList = new List<CourseCsv>();
             try
             {
@@ -108,12 +153,10 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         // 重複したコース名のインデックスを追加
                         indexList.Add(i);
                     }
-                    else
-                    {
-                        courseCsvList.Add(list[i]);
-                    }
+                    courseCsvList.Add(list[i]);
                 }
                 // 重複していたコースの管理機関番号が重複していないかチェック
+                var removeList = new List<CourseCsv>();
                 foreach (int index in indexList)
                 {
                     for (int i = 0; i < list.Count; i++)
@@ -126,21 +169,29 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         {
                             if (value.Cd_kikan1 == duplication.Cd_kikan1 && value.Cd_kikan2 == duplication.Cd_kikan2 && value.Cd_kikan3 == duplication.Cd_kikan3)
                             {
-                                errMsg += duplication.Junkai_course_name + " は重複しています。\n";
+                                removeList.Add(value);
+                                removeList.Add(duplication);
+                                errMsg += duplication.Junkai_course_name + " は事務所とコース名が重複しています。\n";
                             }
                         }
                     }
                 }
                 if (errMsg != "")
                 {
-                    Console.WriteLine(errMsg);
                     this.LogText = errMsg;
+                    Console.WriteLine(errMsg);
+
+                    foreach (CourseCsv c in removeList)
+                    {
+                        courseCsvList.Remove(c);
+                    }
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 this.LogText = e.Message;
+                courseCsvList.Clear();
             }
 
             return courseCsvList;
@@ -166,7 +217,6 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                     list.Add(new Course(csv));
                 }
                 if (!isMatch) this.LogText = "CSVとgeojsonでマッチするコースがありませんでした。";
-                else this.LogText = "CSVを読み込みました。";
             }
             else if (course_point_list == null)
             {
@@ -176,7 +226,6 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                     list.Add(new Course(point));
                 }
                 if (!isMatch) this.LogText = "CSVとgeojsonでマッチするコースがありませんでした。";
-                else this.LogText = "geojsonを読み込みました。";
             }
             else
             {
@@ -323,6 +372,11 @@ namespace GeoJsonConvertToSqlApp.ViewModels
         /// geojsonフォルダを開く
         /// </summary>
         public DelegateCommand OpenFolder { get; private set; }
+
+        /// <summary>
+        /// SQLを作成する
+        /// </summary>
+        public DelegateCommand CreateSql { get; private set; }
 
         /// <summary>
         /// CSVテキスト

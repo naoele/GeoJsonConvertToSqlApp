@@ -14,8 +14,7 @@ namespace GeoJsonConvertToSqlApp.Models
         /// <returns></returns>
         public static string GetCurrentAppDir()
         {
-            return System.IO.Path.GetDirectoryName(
-                System.Reflection.Assembly.GetExecutingAssembly().Location);
+            return Directory.GetCurrentDirectory();
         }
 
         public static List<CourseCsv> ReadCsv(string path)

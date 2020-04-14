@@ -18,6 +18,7 @@ namespace GeoJsonConvertToSqlApp.Models
             this.Cd_kikan1 = courseCsv.Cd_kikan1;
             this.Cd_kikan2 = courseCsv.Cd_kikan2;
             this.Cd_kikan3 = courseCsv.Cd_kikan3;
+            this.Junkai_course_name = courseCsv.Junkai_course_name;
             this.Disp_order = courseCsv.Disp_order;
         }
 

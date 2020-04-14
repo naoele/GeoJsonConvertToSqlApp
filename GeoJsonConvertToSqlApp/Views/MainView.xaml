@@ -151,7 +151,7 @@
             Height ="28"             
             Width ="120" 
             Content="コースSQL作成" 
-            Command="{Binding OpenFolder}"
+            Command="{Binding CreateSql}"
             Margin="12,0,12,0" 
             VerticalAlignment="Center" 
             HorizontalAlignment="center"
