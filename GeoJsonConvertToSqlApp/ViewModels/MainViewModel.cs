@@ -19,8 +19,8 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             this.Kanri1Text = "管理機関大分類コード：";
             this.Kanri2Text = "中分類コード：";
             this.Kanri3Text = "小分類コード：";
-            _select_csv = Exists(Util.GetCurrentAppDir() + @"\M_JUNKAI_COURSE.csv");
-            _select_folder = Exists(Util.GetCurrentAppDir() + @"\geojson");
+            _select_csv = FileExists(Util.GetCurrentAppDir() + @"\M_JUNKAI_COURSE.csv");
+            _select_folder = DirExists(Util.GetCurrentAppDir() + @"\geojson");
             this.SelectCsvText = StoreCsvData(_select_csv);
             this.SelectFolderText = StoreJsonData(_select_folder);
 
@@ -102,7 +102,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         sql.Length -= 3;
                         sql.AppendLine(";");
 
-                        string path = Util.GetCurrentAppDir() + "m_course_line_point.sql";
+                        string path = Util.GetCurrentAppDir() + @"\m_course_line_point.sql";
                         File.WriteAllText(path, sql.ToString(), Encoding.GetEncoding("UTF-8"));
                         this.LogText = path + "にSQLを作成しました。";
 
@@ -117,9 +117,21 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             );
         }
 
-        private string Exists(string filePath)
+        private string FileExists(string filePath)
         {
             if (!File.Exists(filePath))
+            {
+                string err = "選択している " + filePath + " は存在しません";
+                Console.WriteLine(err);
+                this.LogText = err;
+                return "";
+            }
+            return filePath;
+        }
+
+        private string DirExists(string filePath)
+        {
+            if (!Directory.Exists(filePath))
             {
                 string err = "選択している " + filePath + " は存在しません";
                 Console.WriteLine(err);
