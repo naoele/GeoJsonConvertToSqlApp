@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows;
 using System.Windows.Forms;
 
 namespace GeoJsonConvertToSqlApp.ViewModels
@@ -79,23 +80,124 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             {
                 string err = "選択している " + filePath + " は存在しません";
                 Console.WriteLine(err);
-                //this.LogText = err;
                 return "";
             }
             return filePath;
         }
 
-        private void DuplicationCheck(List<CourseCsv> list)
+        /// <summary>
+        /// 同じ分類コードで同じ名前のコースがあった場合にメッセージを表示し
+        /// そのコースは飛ばして処理する
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private List<CourseCsv> DuplicationCheck(List<CourseCsv> list)
         {
-            if (list == null) return;
-            string errMsg = Util.CheckDuplication(list);
-            if (errMsg != "")
+            if (list == null) return null;
+            var courseCsvList = new List<CourseCsv>();
+            try
             {
-                Console.WriteLine(errMsg);
-                this.LogText = errMsg;
+                string errMsg = "";
+                var indexList = new List<int>();
+                var hashset = new HashSet<string>();
+                // 同じ事務所同じコース名がないか重複チェック
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (hashset.Add(list[i].Junkai_course_name) == false)
+                    {
+                        // 重複したコース名のインデックスを追加
+                        indexList.Add(i);
+                    }
+                    else
+                    {
+                        courseCsvList.Add(list[i]);
+                    }
+                }
+                // 重複していたコースの管理機関番号が重複していないかチェック
+                foreach (int index in indexList)
+                {
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        if (index == i) continue;
+
+                        CourseCsv value = list[i];
+                        CourseCsv duplication = list[index];
+                        if (value.Junkai_course_name == duplication.Junkai_course_name)
+                        {
+                            if (value.Cd_kikan1 == duplication.Cd_kikan1 && value.Cd_kikan2 == duplication.Cd_kikan2 && value.Cd_kikan3 == duplication.Cd_kikan3)
+                            {
+                                errMsg += duplication.Junkai_course_name + " は重複しています。\n";
+                            }
+                        }
+                    }
+                }
+                if (errMsg != "")
+                {
+                    Console.WriteLine(errMsg);
+                    this.LogText = errMsg;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                this.LogText = e.Message;
             }
 
-            this.CourseText = list;
+            return courseCsvList;
+        }
+
+        /// <summary>
+        /// CSVとgeojsonのコース名で引き当ててSQLのもとになるモデルを作成する
+        /// </summary>
+        /// <param name="course_csv_list"></param>
+        /// <param name="course_point_list"></param>
+        /// <returns></returns>
+        private List<Course> MergeCourse(List<CourseCsv> course_csv_list, List<CoursePoint> course_point_list)
+        {
+            if (course_csv_list == null && course_point_list == null) return null;
+
+            bool isMatch = false;
+            List<Course> list = new List<Course>();
+            if (course_point_list == null)
+            {
+                foreach (CourseCsv csv in course_csv_list)
+                {
+                    isMatch = true;
+                    list.Add(new Course(csv));
+                }
+                if (!isMatch) this.LogText = "CSVとgeojsonでマッチするコースがありませんでした。";
+                else this.LogText = "CSVを読み込みました。";
+            }
+            else if (course_point_list == null)
+            {
+                foreach (CoursePoint point in course_point_list)
+                {
+                    isMatch = true;
+                    list.Add(new Course(point));
+                }
+                if (!isMatch) this.LogText = "CSVとgeojsonでマッチするコースがありませんでした。";
+                else this.LogText = "geojsonを読み込みました。";
+            }
+            else
+            {
+                string err = "";
+                foreach (CoursePoint point in course_point_list)
+                {
+                    foreach (CourseCsv csv in course_csv_list)
+                    {
+                        if (csv.Junkai_course_name == point.Name)
+                        {
+                            isMatch = true;
+                            list.Add(new Course(csv, point));
+                        }
+                    }
+                    if (!isMatch) err += point.Name + ".geojsonとマッチするコースがありませんでした。\n";
+                    isMatch = false;
+                }
+                this.LogText = err;
+            }
+
+            return list;
         }
 
         /// <summary>
@@ -110,7 +212,8 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             try
             {
                 _course_csv_list = Util.ReadCsv(filePath);
-                DuplicationCheck(_course_csv_list);
+                _course_list = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
+                this.CourseText = _course_list;
             }
             catch (Exception e)
             {
@@ -120,6 +223,11 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             return filePath;
         }
 
+        /// <summary>
+        /// geojsonからデータを取得する
+        /// </summary>
+        /// <param name="dirPath"></param>
+        /// <returns></returns>
         public string StoreJsonData(string dirPath)
         {
             if (dirPath == "") return "";
@@ -135,10 +243,8 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                     _course_point_list.Add(model);
                 }
 
-                foreach (CoursePoint model in _course_point_list)
-                {
-
-                }
+                _course_list = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
+                this.CourseText = _course_list;
             }
             catch (Exception e)
             {
@@ -159,7 +265,8 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                     list.Add(model);
                 }
             }
-            DuplicationCheck(list);
+            _course_list = MergeCourse(DuplicationCheck(list), _course_point_list);
+            this.CourseText = _course_list;
         }
 
         public void ExtractOnlyCdKikan2(int number)
@@ -173,7 +280,8 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                     list.Add(model);
                 }
             }
-            DuplicationCheck(list);
+            _course_list = MergeCourse(DuplicationCheck(list), _course_point_list);
+            this.CourseText = _course_list;
         }
 
         public void ExtractOnlyCdKikan3(int number)
@@ -187,18 +295,24 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                     list.Add(model);
                 }
             }
-            DuplicationCheck(list);
+            _course_list = MergeCourse(DuplicationCheck(list), _course_point_list);
+            this.CourseText = _course_list;
         }
 
         /// <summary>
-        /// 
+        /// コースリスト
         /// </summary>
-        private List<CoursePoint> _course_point_list;
+        private List<Course> _course_list;
 
         /// <summary>
-        /// 
+        /// CSVファイルコースリスト
         /// </summary>
         private List<CourseCsv> _course_csv_list;
+
+        /// <summary>
+        /// geojsonコースリスト
+        /// </summary>
+        private List<CoursePoint> _course_point_list;
 
         /// <summary>
         /// コースCSVファイルを開く
@@ -284,7 +398,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                     _dai_bunrui_textbox = value;
                     this.OnPropertyChanged("DaiBunruiCodeTextbox");
 
-                    DuplicationCheck(_course_csv_list);
+                    this.CourseText = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
                 }
                 else if (value != null && value != _dai_bunrui_textbox)
                 {
@@ -314,7 +428,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                     _chu_bunrui_textbox = value;
                     this.OnPropertyChanged("ChuBunruiCodeTextbox");
 
-                    DuplicationCheck(_course_csv_list);
+                    this.CourseText = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
                 }
                 else if (value != null && value != _chu_bunrui_textbox)
                 {
@@ -364,7 +478,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
         /// <summary>
         /// コースバインディング
         /// </summary>
-        public List<CourseCsv> CourseText
+        public List<Course> CourseText
         {
             get { return _course_text; }
             private set
@@ -376,7 +490,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                 }
             }
         }
-        private List<CourseCsv> _course_text;
+        private List<Course> _course_text;
 
         /// <summary>
         /// Logテキスト
@@ -388,7 +502,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             {
                 if (value != null && value != _log_text)
                 {
-                    _log_text += value + "\n";
+                    _log_text = value + "\n";
                     this.OnPropertyChanged("LogText");
                 }
             }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace GeoJsonConvertToSqlApp.Models
 {
     [DataContract]
-    public class CourseJson
+    public class JsonCourse
     {
 
         [DataMember(Name = "type")]
@@ -16,7 +16,7 @@ namespace GeoJsonConvertToSqlApp.Models
 
         // ハッシュマップ型
         [DataMember(Name = "features")]
-        public List<Features> Features { get; private set; } = new List<Features>();
+        public List<JsonFeatures> Features { get; private set; } = new List<JsonFeatures>();
 
     }
 }

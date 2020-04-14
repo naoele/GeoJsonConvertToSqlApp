@@ -7,15 +7,16 @@ using System.Threading.Tasks;
 
 namespace GeoJsonConvertToSqlApp.Models
 {
-    [DataContract(Name = "features")]
-    public class Features
+    [DataContract(Name = "geometry")]
+    public class JsonGeometry
     {
 
         [DataMember(Name = "type")]
         public string Type { get; set; }
 
-        [DataMember(Name = "geometry")]
-        public Geometry Geometry { get; set; }
+        // リスト型
+        [DataMember(Name = "coordinates")]
+        public List<double[]> CoordinatesList { get; private set; } = new List<double[]>();
 
     }
 }

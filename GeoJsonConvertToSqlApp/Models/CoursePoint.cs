@@ -9,7 +9,7 @@ namespace GeoJsonConvertToSqlApp.Models
 {
     public class CoursePoint
     {
-        public CoursePoint(string name, Geometry geometry)
+        public CoursePoint(string name, JsonGeometry geometry)
         {
             this.Name = name;
             Coordinates = new List<GeoCoordinate>();
@@ -21,15 +21,6 @@ namespace GeoJsonConvertToSqlApp.Models
 
         public string Name { get; set; }
 
-        public IList<GeoCoordinate> Coordinates { get; set; }
-
-        public int Cd_kikan2 { get; set; }
-
-        public int Cd_kikan3 { get; set; }
-
-        public string Junkai_course_name { get; set; }
-
-        public int Disp_order { get; set; }
-
+        public List<GeoCoordinate> Coordinates { get; set; }
     }
 }

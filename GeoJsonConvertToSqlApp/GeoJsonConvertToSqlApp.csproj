@@ -63,10 +63,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\Course.cs" />
     <Compile Include="Models\CoursePoint.cs" />
-    <Compile Include="Models\Features.cs" />
-    <Compile Include="Models\Geometry.cs" />
-    <Compile Include="Models\CourseJson.cs" />
+    <Compile Include="Models\JsonFeatures.cs" />
+    <Compile Include="Models\JsonGeometry.cs" />
+    <Compile Include="Models\JsonCourse.cs" />
     <Compile Include="Models\CourseCsv.cs" />
     <Compile Include="Models\DelegateCommand.cs" />
     <Compile Include="Models\NotifyChangedBase.cs" />
