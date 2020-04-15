@@ -222,7 +222,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
 
             bool isMatch = false;
             List<Course> list = new List<Course>();
-            if (course_point_list == null)
+            if (course_point_list == null || course_point_list.Count == 0)
             {
                 foreach (CourseCsv csv in course_csv_list)
                 {
@@ -231,7 +231,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                 }
                 if (!isMatch) this.LogText = "CSVにコースがありませんでした。";
             }
-            else if (course_csv_list == null)
+            else if (course_csv_list == null || course_csv_list.Count == 0)
             {
                 foreach (CoursePoint point in course_point_list)
                 {
