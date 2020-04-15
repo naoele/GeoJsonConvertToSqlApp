@@ -14,7 +14,7 @@ namespace GeoJsonConvertToSqlApp.Models
             this.Cd_kikan1 = cd_kikan1;
             this.Cd_kikan2 = cd_kikan2;
             this.Cd_kikan3 = cd_kikan3;
-            this.Junkai_course_name = TrimDoubleQuotationMarks(junkai_course_name);
+            this.Junkai_course_name = Util.TrimDoubleQuotationMarks(junkai_course_name);
             this.Disp_order = disp_order;
         }
 
@@ -29,11 +29,6 @@ namespace GeoJsonConvertToSqlApp.Models
         public string Junkai_course_name { get; set; }
 
         public int Disp_order { get; set; }
-
-        public static string TrimDoubleQuotationMarks(string target)
-        {
-            return target.Trim(new char[] { '"' });
-        }
 
     }
 }

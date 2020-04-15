@@ -19,7 +19,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             this.Kanri1Text = "管理機関大分類コード：";
             this.Kanri2Text = "中分類コード：";
             this.Kanri3Text = "小分類コード：";
-            _select_csv = FileExists(Util.GetCurrentAppDir() + @"\M_JUNKAI_COURSE.csv");
+            _select_csv = FileExists(Util.GetCurrentAppDir() + @"\m_junkai_course.csv");
             _select_folder = DirExists(Util.GetCurrentAppDir() + @"\geojson");
             this.SelectCsvText = StoreCsvData(_select_csv);
             this.SelectFolderText = StoreJsonData(_select_folder);

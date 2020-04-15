@@ -22,8 +22,14 @@ namespace GeoJsonConvertToSqlApp.Models
             if (!File.Exists(path)) return null;
             List<string[]> lines = new List<string[]>();
             var readToEnd = new StringBuilder();
-            using (var sr = new StreamReader(path, Encoding.GetEncoding("shift_jis")))
+            using (var sr = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
             {
+                string[] header = sr.ReadLine().Split(',');
+                if ("id" != Util.TrimDoubleQuotationMarks(header[0]))
+                {
+                    // csvの先頭がヘッダー行ではないので追加
+                    lines.Add(header);
+                }
                 while (sr.Peek() > -1)
                 {
                     string[] values = sr.ReadLine().Split(',');
@@ -67,6 +73,11 @@ namespace GeoJsonConvertToSqlApp.Models
                 var serializer = new DataContractJsonSerializer(typeof(T));
                 return (T)serializer.ReadObject(stream);
             }
+        }
+
+        public static string TrimDoubleQuotationMarks(string target)
+        {
+            return target.Trim(new char[] { '"' });
         }
     }
 }
