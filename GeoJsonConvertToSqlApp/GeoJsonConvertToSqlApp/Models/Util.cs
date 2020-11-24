@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Text;
@@ -78,6 +79,42 @@ namespace GeoJsonConvertToSqlApp.Models
         public static string TrimDoubleQuotationMarks(string target)
         {
             return target.Trim(new char[] { '"' });
+        }
+
+        /// <summary>
+        /// 型指定に応じて値を返却
+        /// </summary>
+        /// <typeparam name="T">変換型指定</typeparam>
+        /// <param name="key">キー値</param>
+        /// <returns>返還後値</returns>
+        public static T GetAppValue<T>(string key)
+        {
+            if (typeof(T) == typeof(bool))
+            {
+                return (T)(object)bool.Parse(GetAppSetting(key));
+            }
+
+            if (typeof(T) == typeof(int))
+            {
+                return (T)(object)int.Parse(GetAppSetting(key));
+            }
+
+            if (typeof(T) == typeof(double))
+            {
+                return (T)(object)double.Parse(GetAppSetting(key));
+            }
+
+            return (T)(object)GetAppSetting(key);
+        }
+
+        /// <summary>
+        /// appSettingsに存在するaddタグの中から引数に該当するKey値をもつ値を取得
+        /// </summary>
+        /// <param name="key">キー値</param>
+        /// <returns>キーに紐づく値</returns>
+        private static string GetAppSetting(string key)
+        {
+            return ConfigurationManager.AppSettings[key];
         }
     }
 }

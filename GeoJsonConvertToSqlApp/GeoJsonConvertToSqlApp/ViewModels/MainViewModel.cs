@@ -19,8 +19,8 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             this.Kanri1Text = "管理機関大分類コード：";
             this.Kanri2Text = "中分類コード：";
             this.Kanri3Text = "小分類コード：";
-            _select_csv = FileExists(Util.GetCurrentAppDir() + @"\m_junkai_course.csv");
-            _select_folder = DirExists(Util.GetCurrentAppDir() + @"\geojson");
+            _select_csv = FileExists(Util.GetAppValue<string>("course_csv"));
+            _select_folder = DirExists(Util.GetAppValue<string>("json"));
             this.SelectCsvText = StoreCsvData(_select_csv);
             this.SelectFolderText = StoreJsonData(_select_folder);
 
@@ -102,7 +102,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         sql.Length -= 3;
                         sql.AppendLine(";");
 
-                        string path = Util.GetCurrentAppDir() + @"\m_course_line_point.sql";
+                        string path = Util.GetAppValue<string>("output") + @"\m_course_line_point.sql";
                         File.WriteAllText(path, sql.ToString(), Encoding.GetEncoding("UTF-8"));
                         this.LogText = path + "にSQLを作成しました。";
 
@@ -297,7 +297,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             try
             {
                 _course_point_list = new List<CoursePoint>();
-                IEnumerable<string> files = Directory.EnumerateFiles(dirPath, "*.geojson");
+                IEnumerable<string> files = Directory.EnumerateFiles(dirPath, "*");
                 foreach (string str in files)
                 {
                     Console.WriteLine(str);
