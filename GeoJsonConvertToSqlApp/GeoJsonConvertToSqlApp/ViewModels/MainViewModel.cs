@@ -113,7 +113,8 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         this.LogText = e.StackTrace;
                     }
                 },
-                () => _course_list != null && _course_list.Count > 0 && _course_list[0].Coordinates != null
+                () => true
+                //() => _course_list != null && _course_list.Count > 0 && _course_list[0].Coordinates != null
             );
         }
 
@@ -238,7 +239,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                     isMatch = true;
                     list.Add(new Course(point));
                 }
-                if (!isMatch) this.LogText = "geojsonにコースがありませんでした。";
+                if (!isMatch) this.LogText = "jsonにコースがありませんでした。";
             }
             else
             {
@@ -253,7 +254,7 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                             list.Add(new Course(csv, point));
                         }
                     }
-                    if (!isMatch) err += point.Name + ".geojsonとマッチするコースがありませんでした。\n";
+                    if (!isMatch) err += point.Name + ".jsonとマッチするコースがありませんでした。\n";
                     isMatch = false;
                 }
                 this.LogText = err;
@@ -297,7 +298,8 @@ namespace GeoJsonConvertToSqlApp.ViewModels
             try
             {
                 _course_point_list = new List<CoursePoint>();
-                IEnumerable<string> files = Directory.EnumerateFiles(dirPath, "*");
+                //IEnumerable<string> files = Directory.EnumerateFiles(dirPath, "*");
+                var files = Directory.EnumerateFileSystemEntries(dirPath, "*.json", SearchOption.AllDirectories);
                 foreach (string str in files)
                 {
                     Console.WriteLine(str);
@@ -531,6 +533,8 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         _chu_bunrui_number = number;
                         _course_list = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
                         this.CourseText = _course_list;
+                        StoreCsvData(_select_csv);
+                        StoreJsonData(_select_folder);
                     }
                 }
             }
@@ -566,6 +570,8 @@ namespace GeoJsonConvertToSqlApp.ViewModels
                         _sho_bunrui_number = number;
                         _course_list = MergeCourse(DuplicationCheck(_course_csv_list), _course_point_list);
                         this.CourseText = _course_list;
+                        StoreCsvData(_select_csv);
+                        StoreJsonData(_select_folder);
                     }
                 }
             }
